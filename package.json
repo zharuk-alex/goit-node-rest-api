@@ -4,7 +4,7 @@
   "scripts": {
     "start": "node ./app.js",
     "dev": "nodemon ./app.js",
-    "vercel-build": "echo 'No build required for Express app'"
+    "vercel-build": "echo 'No build step required for Express.js'"
   },
   "dependencies": {
     "cors": "^2.8.5",

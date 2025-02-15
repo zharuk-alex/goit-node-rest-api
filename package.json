@@ -4,6 +4,7 @@
   "scripts": {
     "start": "node ./app.js",
     "dev": "nodemon ./app.js",
+    "vercel-start": "node ./app.js",
     "vercel-build": "echo 'No build step required for Express.js'"
   },
   "dependencies": {

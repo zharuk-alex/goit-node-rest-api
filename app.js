@@ -24,6 +24,4 @@ app.use((err, req, res, next) => {
 
 app.listen(3000, () => {
   console.log("Server is running. Use our API on port: 3000");
-  console.log("DB HOST:", process.env.DATABASE_HOST);
-  console.log("DB NAME:", process.env.DATABASE_NAME);
 });

@@ -21,6 +21,4 @@ const Contact = sequelize.define("contacts", {
   },
 });
 
-Contact.sync({ force: true });
-
 export default Contact;

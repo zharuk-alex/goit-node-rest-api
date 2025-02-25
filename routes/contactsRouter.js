@@ -10,6 +10,7 @@ import {
 import {
   createContactSchema,
   updateContactSchema,
+  updateFavoriteSchema,
 } from "../schemas/contactsSchemas.js";
 
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
@@ -30,6 +31,12 @@ contactsRouter.post(
 contactsRouter.put(
   "/:id",
   validateBody(updateContactSchema),
+  ctrlWrapper(updateContactById)
+);
+
+contactsRouter.patch(
+  "/:id/favorite",
+  validateBody(updateFavoriteSchema),
   ctrlWrapper(updateContactById)
 );
 

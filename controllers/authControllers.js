@@ -30,10 +30,10 @@ export const logout = async (req, res) => {
 };
 
 export const currentUser = async (req, res) => {
-  const { email, username } = req.user;
+  const { email, subscription } = req.user;
 
   res.json({
     email,
-    username,
+    subscription,
   });
 };

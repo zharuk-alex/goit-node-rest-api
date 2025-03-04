@@ -7,7 +7,7 @@ import { verifyToken } from "../helpers/jwt.js";
 const authenticate = async (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization) {
-    return next(HttpError(401, "Not authorized"));
+    return next(HttpError(401));
   }
 
   const [bearer, token] = authorization.split(" ");
@@ -24,6 +24,11 @@ const authenticate = async (req, res, next) => {
   if (!user) {
     return next(HttpError(401, "User not found"));
   }
+
+  if (user.token !== token) {
+    return next(HttpError(401));
+  }
+
   req.user = user;
 
   next();

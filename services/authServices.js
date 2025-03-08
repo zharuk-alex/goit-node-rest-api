@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import gravatar from "gravatar";
 
 import User from "../db/models/User.js";
 
@@ -12,6 +13,7 @@ export const findUser = (query) =>
   });
 
 export const updateUser = async (query, data) => {
+  console.table(data);
   const user = await findUser(query);
   if (!user) return null;
 
@@ -32,8 +34,13 @@ export const registerUser = async (payload) => {
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
+  const avatar = gravatar.url(email, { protocol: "https" });
 
-  const newUser = await User.create({ ...payload, password: hashPassword });
+  const newUser = await User.create({
+    ...payload,
+    password: hashPassword,
+    avatarURL: avatar,
+  });
   return newUser;
 };
 

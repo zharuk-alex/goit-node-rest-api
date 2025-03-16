@@ -13,7 +13,6 @@ export const findUser = (query) =>
   });
 
 export const updateUser = async (query, data) => {
-  console.table(data);
   const user = await findUser(query);
   if (!user) return null;
 
@@ -23,7 +22,7 @@ export const updateUser = async (query, data) => {
 };
 
 export const registerUser = async (payload) => {
-  const { email, password } = payload;
+  const { email, password, verificationToken } = payload;
   const user = await User.findOne({
     where: {
       email,
@@ -40,7 +39,9 @@ export const registerUser = async (payload) => {
     ...payload,
     password: hashPassword,
     avatarURL: avatar,
+    verificationToken,
   });
+
   return newUser;
 };
 

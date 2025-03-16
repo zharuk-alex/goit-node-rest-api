@@ -2,11 +2,23 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 import * as authServices from "../services/authServices.js";
+import { sendVerificationEmail } from "../services/emailService.js";
+import { nanoid } from "nanoid";
 
 const avatarsPath = path.resolve("public", "avatars");
 
 export const register = async (req, res) => {
-  const result = await authServices.registerUser(req.body);
+  const { email, password } = req.body;
+  const host = `${req.protocol}://${req.get("host")}`;
+  const verificationToken = nanoid();
+  const verificationUrl = `${host}/api/auth/verify/${verificationToken}`;
+  const result = await authServices.registerUser({
+    email,
+    password,
+    verificationToken,
+  });
+
+  await sendVerificationEmail(email, verificationUrl);
 
   res.status(201).json({
     user: {
@@ -17,13 +29,17 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const result = await authServices.loginUser(req.body);
+  const { user, token } = await authServices.loginUser(req.body);
+
+  if (!user.verify) {
+    return res.status(404).json({ message: "Email not verified" });
+  }
 
   res.json({
-    token: result.token,
+    token,
     user: {
-      email: result.user?.email,
-      subscription: result.user?.subscription,
+      email: user?.email,
+      subscription: user?.subscription,
     },
   });
 };
@@ -67,4 +83,40 @@ export const updateAvatar = async (req, res) => {
   res.status(200).json({
     avatarURL: result.avatarURL,
   });
+};
+
+export const verifyEmail = async (req, res, next) => {
+  const { verificationToken } = req.params;
+
+  const user = await authServices.findUser({ verificationToken });
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  await user.update({
+    verify: true,
+    verificationToken: null,
+  });
+
+  res.status(200).json({ message: "Verification successful" });
+};
+
+export const resendVerificationEmail = async (req, res, next) => {
+  const { email } = req.body;
+  const user = await authServices.findUser({ email });
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  if (user.verify) {
+    return res
+      .status(400)
+      .json({ message: "Verification has already been passed" });
+  }
+
+  await sendVerificationEmail(email, user.verificationToken);
+
+  res.json({ message: "Verification email sent" });
 };

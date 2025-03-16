@@ -6,7 +6,11 @@ import validateBody from "../decorators/validateBody.js";
 import authenticate from "../middlewares/authenticate.js";
 import upload from "../middlewares/upload.js";
 
-import { authRegisterSchema, authLoginSchema } from "../schemas/authSchemas.js";
+import {
+  authRegisterSchema,
+  authLoginSchema,
+  authResendVerifySchema,
+} from "../schemas/authSchemas.js";
 
 import {
   register,
@@ -14,6 +18,8 @@ import {
   logout,
   currentUser,
   updateAvatar,
+  verifyEmail,
+  resendVerificationEmail,
 } from "../controllers/authControllers.js";
 
 const authRouter = Router();
@@ -35,6 +41,14 @@ authRouter.patch(
   authenticate,
   upload.single("avatar"),
   ctrlWrapper(updateAvatar)
+);
+
+authRouter.get("/verify/:verificationToken", ctrlWrapper(verifyEmail));
+
+authRouter.post(
+  "/verify",
+  validateBody(authResendVerifySchema),
+  ctrlWrapper(resendVerificationEmail)
 );
 
 export default authRouter;

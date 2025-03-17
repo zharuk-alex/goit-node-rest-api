@@ -6,12 +6,14 @@ import { sendVerificationEmail } from "../services/emailService.js";
 import { nanoid } from "nanoid";
 
 const avatarsPath = path.resolve("public", "avatars");
+const getVerificationUrl = ({ host, verificationToken }) =>
+  `${host}/api/auth/verify/${verificationToken}`;
 
 export const register = async (req, res) => {
   const { email, password } = req.body;
   const host = `${req.protocol}://${req.get("host")}`;
   const verificationToken = nanoid();
-  const verificationUrl = `${host}/api/auth/verify/${verificationToken}`;
+  const verificationUrl = getVerificationUrl({ host, verificationToken });
   const result = await authServices.registerUser({
     email,
     password,
@@ -116,7 +118,13 @@ export const resendVerificationEmail = async (req, res, next) => {
       .json({ message: "Verification has already been passed" });
   }
 
-  await sendVerificationEmail(email, user.verificationToken);
+  const host = `${req.protocol}://${req.get("host")}`;
+  const verificationUrl = getVerificationUrl({
+    host,
+    verificationToken: user.verificationToken,
+  });
+
+  await sendVerificationEmail(email, verificationUrl);
 
   res.json({ message: "Verification email sent" });
 };
